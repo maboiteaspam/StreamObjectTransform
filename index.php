@@ -1,9 +1,3 @@
-# StreamObjectTransform
-port of rvagg/through2 object stream to PHP.
-
-### Example
-
-```
 <?php
 
 include("StreamObjectTransform.php");
@@ -24,5 +18,3 @@ $stream->pipe(through(function ($chunk) {
 ;
 
 $stream->write(['some', 'objects']);
-```
-
