@@ -1,6 +1,9 @@
 # StreamObjectTransform
 port of https://github.com/rvagg/through2 object stream to PHP.
 
+It does not aim to be as powerful as the node stream interface, 
+it s more about the programming pattern that i found really powerful.
+
 ### Example
 
 ```php
