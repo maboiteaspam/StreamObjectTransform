@@ -1,9 +1,9 @@
 # StreamObjectTransform
-port of rvagg/through2 object stream to PHP.
+port of https://github.com/rvagg/through2 object stream to PHP.
 
 ### Example
 
-```
+```php
 <?php
 
 include("StreamObjectTransform.php");
