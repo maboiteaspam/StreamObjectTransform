@@ -99,20 +99,12 @@ class StreamDate{
     /**
      * update any written $chunk->$prop
      * as a date string or object
-     * to add given $interval of time
-     *
-     * @param $prop
-     * @param $interval
-     * @return \Closure
-     */
-    /**
-     * update any written $chunk->$prop
-     * as a date string or object
      * to modify it with $fn
      *
      * if $fn returns a \Callable
      * it is invoked on current stream
      *      $fn($chunk, $stream);
+     * and must return the modified $date value
      *
      *
      * @param $prop
