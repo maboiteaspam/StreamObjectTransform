@@ -207,8 +207,8 @@ StreamObjectTransform::through()
     ->write(new Entry());
 ```
 
-- https://github.com/maboiteaspam/BlogData/blob/src/C/Modifier/Entry.php
-- https://github.com/maboiteaspam/BlogData/blob/src/C/Modifier/Comment.php
+- https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php
+- https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Comment.php
 
 ##### Fixture Entity
 
@@ -235,8 +235,8 @@ class Entry{
 }
 ```
 
-- https://github.com/maboiteaspam/BlogData/blob/src/C/Entity/Entry.php
-- https://github.com/maboiteaspam/BlogData/blob/src/C/Entity/Comment.php
+- https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Entry.php
+- https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Comment.php
 
 ##### Conclusion
 
