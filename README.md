@@ -39,7 +39,7 @@ StreamObjectTransform::through()
 Use `composer` to install this library.
 
 ```
-php composer require git@github.com:maboiteaspam/Welcome.git
+php composer require git@github.com:maboiteaspam/StreamObjectTransform.git
 ```
 
 
