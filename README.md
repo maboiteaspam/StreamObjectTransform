@@ -210,6 +210,8 @@ StreamObjectTransform::through()
 
 - https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php
 - https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Comment.php
+- https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamText.php
+- https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamFlow.php
 
 ##### Fixture Entity
 

@@ -1,28 +1,77 @@
 <?php
 namespace C\Stream;
 
+/**
+ * Class StreamObjectTransform
+ * is the pipes implementation
+ * to simulate stream-like api
+ *
+ * @package C\Stream
+ */
 class StreamObjectTransform{
 
+    /**
+     * @var \Closure|null
+     */
     protected $onData;
+    /**
+     * @var \Closure|null
+     */
     protected $onFlush;
+    /**
+     * @var array
+     */
     public $streams = [];
 
+    /**
+     * @param \Closure|null $onData
+     * @param \Closure|null $onFlush
+     */
     public function __construct ($onData=null, $onFlush=null) {
-        $this->onData = $onData ? $onData : function ($chunk) {$this->push($chunk);};
-        $this->onFlush = $onFlush ? $onFlush : function () {};
+        $this->onData = $onData
+            ? $onData
+            // a stream transform function
+            : function ($chunk, $stream) {
+                // must push $chunk
+                // if, it want to forward the data
+                $stream->push($chunk);
+                // sometimes, it want to skip them from following processing.
+            };
+        $this->onFlush = $onFlush
+            ? $onFlush
+            : function () {
+                // is the function called when
+                // $stream->write(null) is invoked
+                // to signal the end of the underlying data stream
+            };
     }
 
     /**
-     * @param mixed $stream
+     * pipe $stream
+     * $stream can be one of
+     * StreamObjectTransform or \Callable
+     *
+     * if $stream is_callable, it is transformed
+     * into a new StreamObjectTransform($stream) instance.
+     *
+     * Returns $this pipe instance.
+     *
+     * @param StreamObjectTransform|\Callable $stream
      * @return StreamObjectTransform
      */
     public function pipe($stream) {
-        $stream = $stream instanceof StreamObjectTransform ? $stream : new StreamObjectTransform($stream);
+
+        $stream = $stream instanceof StreamObjectTransform
+            ? $stream
+            : new StreamObjectTransform($stream);
+
         $this->streams[] = $stream;
         return $this;
     }
 
     /**
+     * remove given $stream object
+     *
      * @param mixed $stream
      */
     public function unpipe($stream) {
@@ -30,6 +79,8 @@ class StreamObjectTransform{
     }
 
     /**
+     * Write $some data to underlying $streams
+     *
      * @param mixed $some
      */
     public function push($some) {
@@ -39,6 +90,8 @@ class StreamObjectTransform{
     }
 
     /**
+     * Write $some data on this $stream
+     *
      * @param mixed $some
      */
     public function write($some) {
@@ -83,8 +136,9 @@ class StreamObjectTransform{
 
 
     /**
-     * @param null $onData
-     * @param null $onFlush
+     * helper to create new stream
+     * @param \Closure|null $onData
+     * @param \Closure|null $onFlush
      * @return StreamObjectTransform
      */
     public static function through ($onData=null, $onFlush=null) {
@@ -94,8 +148,8 @@ class StreamObjectTransform{
 
 
 /**
- * @param null $onData
- * @param null $onFlush
+ * @param \Closure|null $onData
+ * @param \Closure|null $onFlush
  * @return StreamObjectTransform
  */
 function through ($onData=null, $onFlush=null) {

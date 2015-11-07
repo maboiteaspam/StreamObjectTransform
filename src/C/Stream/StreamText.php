@@ -1,9 +1,27 @@
 <?php
 namespace C\Stream;
 
+/**
+ * Class StreamText
+ * provides text generation stream object transform
+ *
+ * text generation is implemented
+ * with this awesome module
+ * joshtronic\LoremIpsum
+ *
+ * @package C\Stream
+ */
 class StreamText{
+    /**
+     * @var \joshtronic\LoremIpsum
+     */
     protected $ipsum;
+    /**
+     * @var array
+     */
     public $nicknames;
+
+
     public function __construct() {
         $this->ipsum = new \joshtronic\LoremIpsum();
         $this->nicknames = [
@@ -16,6 +34,15 @@ class StreamText{
             'John Connor',
         ];
     }
+
+    /**
+     * update any written $chunk
+     * to set $prop with generated $c words
+     *
+     * @param $prop
+     * @param $c
+     * @return \Closure
+     */
     public function words ($prop, $c) {
         $ipsum = $this->ipsum;
         return function ($chunk, $stream) use($ipsum, $prop, $c) {
@@ -24,6 +51,15 @@ class StreamText{
             return $chunk->{$prop};
         };
     }
+
+    /**
+     * update any written $chunk
+     * to set $prop with generated $c sentences
+     *
+     * @param $prop
+     * @param $c
+     * @return \Closure
+     */
     public function sentences ($prop, $c) {
         $ipsum = $this->ipsum;
         return function ($chunk, $stream) use($ipsum, $prop, $c) {
@@ -32,6 +68,20 @@ class StreamText{
             return $chunk->{$prop};
         };
     }
+
+    /**
+     * update any written $chunk
+     * to set $prop with one value within $enumValues
+     *
+     * values of $enumValues are distributed
+     * uniquely until they are all consumed.
+     * consumed values of $enumValues are then
+     * reset to be re used.
+     *
+     * @param $prop
+     * @param $enumValues
+     * @return \Closure
+     */
     public function enum ($prop, $enumValues) {
         $enum = [
             'values'=>$enumValues,
