@@ -36,11 +36,17 @@ StreamObjectTransform::through()
 
 ## Install
 
-Use `composer` to install this library.
+Until the module is published,
+add this repository to the `composer` file
+then run `composer update`.
+
+or run `c2-bin require-gh`
 
 ```
-php composer require git@github.com:maboiteaspam/StreamObjectTransform.git
+c2-bin require-gh -m=maboiteaspam/StreamObjectTransform
 ```
+
+Read more about [c2-bin](https://github.com/maboiteaspam/c2-bin)
 
 
 ### Example
