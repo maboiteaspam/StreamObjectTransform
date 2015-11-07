@@ -53,7 +53,7 @@ Read more about [c2-bin](https://github.com/maboiteaspam/c2-bin)
 
 Stream `some`,
 
-then `duplex` it 2 times
+then `demultiplex` it 2 times
 
 ```php
 <?php
@@ -65,17 +65,17 @@ use \C\Stream\StreamObjectTransform;
 // create a stream
 StreamObjectTransform::through()
 
-    // pipe it to a duplexer
-    ->pipe( StreamFlow::duplex(2)
+    // pipe it to a demultiplexer
+    ->pipe( StreamFlow::demultiplex(2)
 
-            // transform duplexed data
+            // transform demultiplexed data
             ->pipe(function($chunk){
-                var_dump("duplexed $chunk");
+                var_dump("demultiplexed $chunk");
             })
     )
     // transform data of the initial stream
     ->pipe(function($chunk){
-        var_dump("not duplexed $chunk");
+        var_dump("not demultiplexed $chunk");
     })
     ->write('some');
 
@@ -120,7 +120,7 @@ class Generator{
 
         $concat = new StreamConcat();
 
-        StreamFlow::duplex($len)
+        StreamFlow::demultiplex($len)
             ->pipe($transform)
             ->pipe($concat->appendTo($results))
             ->write($what);
@@ -131,11 +131,11 @@ class Generator{
 }
 ```
 
-It will duplex `$len` times the provided `$what` data.
+It will demultiplex `$len` times the provided `$what` data.
 
-For each duplexed data, it transforms is with `$how`.
+For each demultiplexed data, it transforms is with `$how`.
 
-It then pipe duplexed data to a resulting array `$results`.
+It then pipe demultiplexed data to a resulting array `$results`.
 
 ##### Fixture Generator
 
@@ -163,7 +163,7 @@ $comment    = new CommentModifier();
  * is random.
  *
  */
-return Generator::generate( new EntryEntity(), // the model object to duplex
+return Generator::generate( new EntryEntity(), // the model object to demultiplex
     $entry->transform() // the stream transform to apply to each object
         ->pipe( $object->modify('comments', // update comments property
             function ($chunk) use($comment) {

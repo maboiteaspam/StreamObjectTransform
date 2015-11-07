@@ -16,7 +16,7 @@ class StreamFlow{
      * @param int $len
      * @return StreamObjectTransform
      */
-    public static function duplex ($len=10) {
+    public static function demultiplex ($len=10) {
         return new StreamObjectTransform(function ($chunk, $stream) use($len) {
             for ($i=0;$i<$len;$i++) {
                 $cloned = is_object($chunk)?clone($chunk):$chunk;
