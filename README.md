@@ -192,10 +192,11 @@ they are qualified to receive respective kind of object,
 and forge their properties with help of stream transforms,
 
 ```php
+namespace \C\BlogData\Modifier\Entry;
 
 use \C\Stream\StreamObject;
 use \C\Stream\StreamObjectTransform;
-use \C\BlogData\Modifier\Entry;
+use \C\BlogData\Entity\Entry;
 
 $object = new StreamObject();
 
