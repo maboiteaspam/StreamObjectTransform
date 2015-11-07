@@ -210,6 +210,45 @@ StreamObjectTransform::through()
 
 - https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php
 - https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Comment.php
+
+##### Object Modifiers
+
+Object modifiers such `StreamObject`, `StreamDate` are streams transforms
+to update streamed objects.
+
+```php
+<?php
+namespace C\Stream;
+
+/**
+ * Class StreamDate
+ * provides date property transform
+ *
+ * @package C\BlogData\Fixture
+ */
+class StreamDate{
+    /**
+     * update any written $chunk->$prop
+     * to set a date string
+     * formatted with $format
+     *
+     * @param $prop
+     * @param string $format
+     * @param null $date
+     * @return \Closure
+     */
+    public function generate ($prop, $format='Y-m-d H:i', $date=null) {
+        $date = $date===null? new \DateTime() :$date;
+        return function ($chunk, $stream) use($prop, $format, $date) {
+            $chunk->{$prop} = date_format($date, $format);
+            $stream->push($chunk);
+            return $chunk->{$prop};
+        };
+    }
+    //....
+}
+```
+
 - https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamText.php
 - https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamFlow.php
 
