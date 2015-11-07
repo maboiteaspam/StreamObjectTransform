@@ -101,7 +101,7 @@ class Generator{
      * push $len times
      * a clone of $what
      * modified with $transform
-     * returns the resulting array of data
+     * returns the resulting array $results of data
      *
      * @param $what
      * @param $transform
