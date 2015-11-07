@@ -1,10 +1,11 @@
 <?php
+namespace C\Stream;
 
 class StreamObjectTransform{
 
     protected $onData;
     protected $onFlush;
-    protected $streams = [];
+    public $streams = [];
 
     public function __construct ($onData=null, $onFlush=null) {
         $this->onData = $onData ? $onData : function ($chunk) {$this->push($chunk);};
@@ -12,16 +13,17 @@ class StreamObjectTransform{
     }
 
     /**
-     * @param StreamObjectTransform $stream
+     * @param mixed $stream
      * @return StreamObjectTransform
      */
     public function pipe($stream) {
+        $stream = $stream instanceof StreamObjectTransform ? $stream : new StreamObjectTransform($stream);
         $this->streams[] = $stream;
-        return $stream;
+        return $this;
     }
 
     /**
-     * @param StreamObjectTransform $stream
+     * @param mixed $stream
      */
     public function unpipe($stream) {
         $this->streams = array_diff($this->streams, array($stream));
@@ -30,7 +32,7 @@ class StreamObjectTransform{
     /**
      * @param mixed $some
      */
-    protected function push($some) {
+    public function push($some) {
         foreach($this->streams as $stream) {
             $stream->write($some);
         }
@@ -42,13 +44,13 @@ class StreamObjectTransform{
     public function write($some) {
         if ($this->onData) {
             if ($some!==NULL) {
-                $boundCl = $this->onData->bindTo($this, $this);
-                $boundCl($some);
+                $boundCl = $this->onData;
+                $boundCl($some, $this);
 
             } else {
                 // Should it emit close / end event here ?
-                $boundCl = $this->onFlush->bindTo($this, $this);
-                $boundCl($some);
+                $boundCl = $this->onFlush;
+                $boundCl($some, $this);
 
             }
         }
@@ -78,6 +80,16 @@ class StreamObjectTransform{
         }
     }
     #endregion
+
+
+    /**
+     * @param null $onData
+     * @param null $onFlush
+     * @return StreamObjectTransform
+     */
+    public static function through ($onData=null, $onFlush=null) {
+        return new StreamObjectTransform($onData, $onFlush);
+    }
 }
 
 
