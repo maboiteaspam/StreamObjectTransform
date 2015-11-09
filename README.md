@@ -2,15 +2,16 @@
 port of https://github.com/rvagg/through2 object stream to PHP.
 
 It does not aim to be as powerful as the node stream interface, 
-it s more about the programming pattern that i found really powerful.
+it s more about the programming pattern that i found really cool.
+
+See yourself!
+
 
 ### Usage
 
-require dependencies and start
-
-to pipe object streams
-
-to generate and transform data.
+require dependencies, then start
+to connect pipe to transforms
+and stream objects.
 
 
 ```php
@@ -28,7 +29,7 @@ StreamObjectTransform::through()
     ->pipe(function($chunk){
         var_dump("not duplexed $chunk");
         $stream->push($chunk); // push the chunk to the conneccted pipes.
-        // sometimes itis interesting to not push the chunk.
+        // sometimes it is interesting to not push the chunk.
     })
 
     // write a data or an objeect to stream
@@ -210,9 +211,9 @@ class Generator{
 
 It will demultiplex `$len` times the provided `$what` data.
 
-For each demultiplexed data, it transforms is with `$how`.
+For each chunk, it transforms it with `$transform`.
 
-It then pipe demultiplexed data to a resulting array `$results`.
+It then pipe each chunks to a resulting array `$results`.
 
 ##### Fixture Generator
 
@@ -242,8 +243,7 @@ $comment    = new CommentModifier();
  */
 return Generator::generate( new EntryEntity(), // the model object to demultiplex
     $entry->transform() // the stream transform to apply to each object
-        ->pipe( $object->modify('comments', // update comments property
-            function ($chunk) use($comment) {
+        ->pipe( $object->modify('comments', function ($chunk) use($comment) { // update comments property
                 return Generator::generate( new CommentEntity(), // generate 2 comments
                     $comment->transform($chunk->id), // forge them with this stream transform
                     2 );
@@ -254,7 +254,12 @@ return Generator::generate( new EntryEntity(), // the model object to demultiple
 
 In this example a hundred `Entry` objects are created.
 
-Each object get its properties populated, 2 `Comment` are also attached.
+Each object get its properties populated by
+`entry->transform()`.
+A pipe is then connected to generate and attach 2 `Comment`
+to the current `Entry` chunk.
+Each `Comment` is transformed by `comment->transform($chunk->id)`.
+The entry id is used to distribute ids of the `Comment` objects.
 
 It finally returns an array of forged `Entity` objects.
 
