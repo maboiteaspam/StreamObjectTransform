@@ -27,6 +27,8 @@ StreamObjectTransform::through()
     // pipe data and flow transformers
     ->pipe(function($chunk){
         var_dump("not duplexed $chunk");
+        $stream->push($chunk); // push the chunk to the conneccted pipes.
+        // sometimes itis interesting to not push the chunk.
     })
 
     // write a data or an objeect to stream
@@ -71,15 +73,90 @@ StreamObjectTransform::through()
             // transform demultiplexed data
             ->pipe(function($chunk){
                 var_dump("demultiplexed $chunk");
+                $stream->push($chunk);
             })
     )
     // transform data of the initial stream
     ->pipe(function($chunk){
         var_dump("not demultiplexed $chunk");
+        $stream->push($chunk);
     })
     ->write('some');
 
 ```
+
+
+### API
+
+Class __StreamObjectTransform__
+
+Apply transform on streamed objects.
+
+__StreamObjectTransform:: pipe ($stream)__
+
+    /*
+     * pipe $stream
+     *      $stream can be one of
+     *      StreamObjectTransform or \Callable
+     *
+     * if $stream is_callable, it is transformed
+     * into a new StreamObjectTransform($stream) instance.
+     *
+     * Returns $this pipe instance.
+     */
+
+
+__StreamObjectTransform:: write ($some)__
+
+    /**
+     * Write $some data on this $stream.
+     * It will call the transform,
+     * which can
+     * transform, multiply, pass or drop
+     * the stream chunk of data.
+     *
+     * to drop the chunk, do not call push.
+     *
+     * @param mixed $some
+     */
+
+
+__StreamObjectTransform:: push ($some)__
+
+    /**
+     * Write $some data to underlying $streams.
+     *
+     * please consider this :
+     * It should be __protected__, but for some reason,
+     * i had to make it public, and also, pass the $stream
+     * instance along the onData callback.
+     *
+     * I don t recommend to use it outside of the transform callbacks.
+     *
+     * @param mixed $some
+     */
+
+
+Class __StreamConcat__
+
+Watch for streamed objects and append them to array.
+
+Class __StreamDate__
+
+Manipulate date of streamed objects.
+
+Class __StreamFlow__
+
+Control the flow of objects passed to the connected pipes.
+
+Class __StreamObject__
+
+Manipulate streamed chunks as objects and modify them.
+
+Class __StreamText__
+
+Generate text, words, sentences, enums and apply them to streamed chunks.
+
 
 
 ### Read more
