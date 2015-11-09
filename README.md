@@ -168,7 +168,7 @@ but gathers multiple elements to provide a real example of use.
 
 ##### Generator
 
-If you define and use a class help to generate entities such,
+If you define and use a class helper to generate entities such,
 
 __File:__ /C/Fixture/Generator.php
 
@@ -217,7 +217,7 @@ It then pipe each chunks to a resulting array `$results`.
 
 ##### Fixture Generator
 
-This helps to write simple `fixtures` generators such as,
+With this new helper on hand, a `fixtures` generator can look like this,
 
 ```php
 <?php
@@ -241,14 +241,16 @@ $comment    = new CommentModifier();
  * is random.
  *
  */
-return Generator::generate( new EntryEntity(), // the model object to demultiplex
-    $entry->transform() // the stream transform to apply to each object
+return Generator::generate(
+    new EntryEntity(),      // the model object to demultiplex
+
+    $entry->transform()     // the stream transform to apply to each object
         ->pipe( $object->modify('comments', function ($chunk) use($comment) { // update comments property
-                return Generator::generate( new CommentEntity(), // generate 2 comments
+                return Generator::generate(
+                    new CommentEntity(), // generate 2 comments
                     $comment->transform($chunk->id), // forge them with this stream transform
                     2 );
-            })
-        )
+        }))
     , 100); // count of objects to create
 ```
 
@@ -276,20 +278,55 @@ they are qualified to receive respective kind of object,
 and forge their properties with help of stream transforms,
 
 ```php
-namespace \C\BlogData\Modifier\Entry;
+<?php
+namespace C\BlogData\Modifier;
 
+use \C\Stream\StreamImgUrl;
+use \C\Stream\StreamDate;
+use \C\Stream\StreamText;
 use \C\Stream\StreamObject;
 use \C\Stream\StreamObjectTransform;
-use \C\BlogData\Entity\Entry;
 
-$object = new StreamObject();
+/**
+ * Class Entry
+ * provides stream to forge
+ * Entry entities
+ *
+ * @package C\BlogData\Modifier
+ */
+class Entry{
+    /**
+     * return a stream object
+     * to transform any pushed $entry entity
+     *
+     * @param int $range_start
+     * @return mixed
+     */
+    public function transform ($range_start=0) {
 
-StreamObjectTransform::through()
+        $imgUrlGenerator = new StreamImgUrl();
+        $dateGenerator = new StreamDate();
+        $textGenerator = new StreamText();
+        $object = new StreamObject();
 
-    ->pipe($object->incProp('id', $range_start))
-    ->pipe($object->setProp('blog_entry_id', $range_start))
-
-    ->write(new Entry());
+        return StreamObjectTransform::through()
+            ->pipe($object->incProp('id', $range_start))
+            ->pipe($dateGenerator->generate('created_at'))
+            ->pipe($dateGenerator->modify('created_at', function ($chunk, $prop) use($dateGenerator){
+                return $dateGenerator->sub($prop, "{$chunk->id} days + 1*{$chunk->id} hours");
+            }))
+            ->pipe($dateGenerator->generate('updated_at'))
+            ->pipe($dateGenerator->modify('updated_at', function ($chunk, $prop) use($dateGenerator){
+                return $dateGenerator->sub($prop, "{$chunk->id} days + 1*{$chunk->id} hours");
+            }))
+            ->pipe($textGenerator->enum('author', $textGenerator->nicknames))
+            ->pipe($textGenerator->enum('status', ['VISIBLE', 'HIDDEN']))
+            ->pipe($textGenerator->words('title', rand(2, 5)))
+            ->pipe($textGenerator->sentences('content', rand(1, 3)))
+            ->pipe($imgUrlGenerator->imgUrl('img_alt', rand(1, 3)))
+            ;
+    }
+}
 ```
 
 - https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php
