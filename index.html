@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>StreamObjectTransform by maboiteaspam</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>StreamObjectTransform</h1>
+        <h2>port of rvagg/through2 object stream to PHP.</h2>
+        <a href="https://github.com/maboiteaspam/StreamObjectTransform" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="streamobjecttransform" class="anchor" href="#streamobjecttransform" aria-hidden="true"><span class="octicon octicon-link"></span></a>StreamObjectTransform</h1>
+
+<p>port of <a href="https://github.com/rvagg/through2">https://github.com/rvagg/through2</a> object stream to PHP.</p>
+
+<p>It does not aim to be as powerful as the node stream interface, 
+it s more about the programming pattern that i found really cool.</p>
+
+<p>See yourself!</p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>require dependencies and start</p>
+
+<p>to pipe object streams</p>
+
+<p>to generate and transform data.</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamFlow</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObjectTransform</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// create a stream</span></span>
+<span class="pl-s1"><span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">// pipe data and flow transformers</span></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-k">function</span>(<span class="pl-smi">$chunk</span>){</span>
+<span class="pl-s1">        <span class="pl-c1">var_dump</span>(<span class="pl-s"><span class="pl-pds">"</span>not duplexed <span class="pl-smi">$chunk</span><span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">        <span class="pl-smi">$stream</span><span class="pl-k">-&gt;</span>push(<span class="pl-smi">$chunk</span>); <span class="pl-c">// push the chunk to the conneccted pipes.</span></span>
+<span class="pl-s1">        <span class="pl-c">// sometimes it is interesting to not push the chunk.</span></span>
+<span class="pl-s1">    })</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">// write a data or an object to stream</span></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>some<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"></span></pre></div>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Until the module is published,
+add this repository to the <code>composer</code> file
+then run <code>composer update</code>.</p>
+
+<p>or run <code>c2-bin require-gh</code></p>
+
+<pre><code>c2-bin require-gh -m=maboiteaspam/StreamObjectTransform
+</code></pre>
+
+<p>Read more about <a href="https://github.com/maboiteaspam/c2-bin">c2-bin</a></p>
+
+<h3>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h3>
+
+<p>Stream <code>some</code>,</p>
+
+<p>then <code>demultiplex</code> it 2 times</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamFlow</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObjectTransform</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// create a stream</span></span>
+<span class="pl-s1"><span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">// pipe it to a demultiplexer, </span></span>
+<span class="pl-s1">    <span class="pl-c">// it will clone the streamed object n times</span></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe( <span class="pl-c1">StreamFlow</span><span class="pl-k">::</span>demultiplex(<span class="pl-c1">2</span>)</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">            <span class="pl-c">// transform demultiplexed data</span></span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-k">function</span>(<span class="pl-smi">$chunk</span>){</span>
+<span class="pl-s1">                <span class="pl-c1">var_dump</span>(<span class="pl-s"><span class="pl-pds">"</span>demultiplexed <span class="pl-smi">$chunk</span><span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">                <span class="pl-smi">$stream</span><span class="pl-k">-&gt;</span>push(<span class="pl-smi">$chunk</span>);</span>
+<span class="pl-s1">            })</span>
+<span class="pl-s1">    )</span>
+<span class="pl-s1">    <span class="pl-c">// transform data of the initial stream</span></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-k">function</span>(<span class="pl-smi">$chunk</span>){</span>
+<span class="pl-s1">        <span class="pl-c1">var_dump</span>(<span class="pl-s"><span class="pl-pds">"</span>not demultiplexed <span class="pl-smi">$chunk</span><span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">        <span class="pl-smi">$stream</span><span class="pl-k">-&gt;</span>push(<span class="pl-smi">$chunk</span>);</span>
+<span class="pl-s1">    })</span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>some<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"></span></pre></div>
+
+<h3>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h3>
+
+<p>Class <strong>StreamObjectTransform</strong></p>
+
+<p>Apply transform on streamed objects.</p>
+
+<p><strong>StreamObjectTransform:: pipe ($stream)</strong></p>
+
+<pre><code>/*
+ * pipe $stream
+ *      $stream can be one of
+ *      StreamObjectTransform or \Callable
+ *
+ * if $stream is_callable, it is transformed
+ * into a new StreamObjectTransform($stream) instance.
+ *
+ * Returns $this pipe instance.
+ */
+</code></pre>
+
+<p><strong>StreamObjectTransform:: write ($some)</strong></p>
+
+<pre><code>/**
+ * Write $some data on this $stream.
+ * It will call the transform,
+ * which can
+ * transform, multiply, pass or drop
+ * the stream chunk of data.
+ *
+ * to drop the chunk, do not call push.
+ *
+ * @param mixed $some
+ */
+</code></pre>
+
+<p><strong>StreamObjectTransform:: push ($some)</strong></p>
+
+<pre><code>/**
+ * Write $some data to underlying $streams.
+ *
+ * please consider this :
+ * It should be __protected__, but for some reason,
+ * i had to make it public, and also, pass the $stream
+ * instance along the onData callback.
+ *
+ * I don t recommend to use it outside of the transform callbacks.
+ *
+ * @param mixed $some
+ */
+</code></pre>
+
+<p>Class <strong>StreamConcat</strong></p>
+
+<p>Watch for streamed objects and append them to array.</p>
+
+<p>Class <strong>StreamDate</strong></p>
+
+<p>Manipulate date of streamed objects.</p>
+
+<p>Class <strong>StreamFlow</strong></p>
+
+<p>Control the flow of objects passed to the connected pipes.</p>
+
+<p>Class <strong>StreamObject</strong></p>
+
+<p>Manipulate streamed chunks as objects and modify them.</p>
+
+<p>Class <strong>StreamText</strong></p>
+
+<p>Generate text, words, sentences, enums and apply them to streamed chunks.</p>
+
+<h3>
+<a id="read-more" class="anchor" href="#read-more" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read more</h3>
+
+<p>Read more with this example, it s a bit simplified</p>
+
+<p>but gathers multiple elements to provide a real example of use.</p>
+
+<h5>
+<a id="generator" class="anchor" href="#generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Generator</h5>
+
+<p>If you define and use a class help to generate entities such,</p>
+
+<p><strong>File:</strong> /C/Fixture/Generator.php</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">C\Fixture</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">C\Stream\StreamConcat</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">C\Stream\StreamFlow</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Generator</span>{</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * push $len times</span></span>
+<span class="pl-s1"><span class="pl-c">     * a clone of $what</span></span>
+<span class="pl-s1"><span class="pl-c">     * modified with $transform</span></span>
+<span class="pl-s1"><span class="pl-c">     * returns the resulting array $results of data</span></span>
+<span class="pl-s1"><span class="pl-c">     *</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> $what</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> $transform</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> int $len</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> \ArrayObject</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">function</span> <span class="pl-en">generate</span> (<span class="pl-smi">$what</span>, <span class="pl-smi">$transform</span>, <span class="pl-smi">$len</span><span class="pl-k">=</span><span class="pl-c1">10</span>) {</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-smi">$results</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">\ArrayObject</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-smi">$concat</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamConcat</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c1">StreamFlow</span><span class="pl-k">::</span>demultiplex(<span class="pl-smi">$len</span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$transform</span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$concat</span><span class="pl-k">-&gt;</span>appendTo(<span class="pl-smi">$results</span>))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>write(<span class="pl-smi">$what</span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-smi">$results</span>;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">}</span></pre></div>
+
+<p>It will demultiplex <code>$len</code> times the provided <code>$what</code> data.</p>
+
+<p>For each demultiplexed data, it transforms is with <code>$how</code>.</p>
+
+<p>It then pipe demultiplexed data to a resulting array <code>$results</code>.</p>
+
+<h5>
+<a id="fixture-generator" class="anchor" href="#fixture-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixture Generator</h5>
+
+<p>This helps to write simple <code>fixtures</code> generators such as,</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Fixture\Generator</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Entity\Entry</span> <span class="pl-k">as</span> <span class="pl-c1">EntryEntity</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Entity\Comment</span> <span class="pl-k">as</span> <span class="pl-c1">CommentEntity</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Modifier\Entry</span> <span class="pl-k">as</span> <span class="pl-c1">EntryModifier</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Modifier\Comment</span> <span class="pl-k">as</span> <span class="pl-c1">CommentModifier</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$entry</span>      <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">EntryModifier</span>();</span>
+<span class="pl-s1"><span class="pl-smi">$comment</span>    <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">CommentModifier</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * generate a hundred entries</span></span>
+<span class="pl-s1"><span class="pl-c"> * each entry has 2 comments</span></span>
+<span class="pl-s1"><span class="pl-c"> *</span></span>
+<span class="pl-s1"><span class="pl-c"> * their status (VISIBLE, HIDDEN)</span></span>
+<span class="pl-s1"><span class="pl-c"> * is random.</span></span>
+<span class="pl-s1"><span class="pl-c"> *</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">EntryEntity</span>(), <span class="pl-c">// the model object to demultiplex</span></span>
+<span class="pl-s1">    <span class="pl-smi">$entry</span><span class="pl-k">-&gt;</span>transform() <span class="pl-c">// the stream transform to apply to each object</span></span>
+<span class="pl-s1">        <span class="pl-k">-&gt;</span>pipe( <span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>comments<span class="pl-pds">'</span></span>, <span class="pl-c">// update comments property</span></span>
+<span class="pl-s1">            <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>) <span class="pl-k">use</span>(<span class="pl-smi">$comment</span>) {</span>
+<span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">CommentEntity</span>(), <span class="pl-c">// generate 2 comments</span></span>
+<span class="pl-s1">                    <span class="pl-smi">$comment</span><span class="pl-k">-&gt;</span>transform(<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>), <span class="pl-c">// forge them with this stream transform</span></span>
+<span class="pl-s1">                    <span class="pl-c1">2</span> );</span>
+<span class="pl-s1">            })</span>
+<span class="pl-s1">        )</span>
+<span class="pl-s1">    , <span class="pl-c1">100</span>); <span class="pl-c">// count of objects to create</span></span></pre></div>
+
+<p>In this example a hundred <code>Entry</code> objects are created.</p>
+
+<p>Each object get its properties populated, 2 <code>Comment</code> are also attached.</p>
+
+<p>It finally returns an array of forged <code>Entity</code> objects.</p>
+
+<p>Ready to use.</p>
+
+<h5>
+<a id="fixture-modifier" class="anchor" href="#fixture-modifier" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixture Modifier</h5>
+
+<p><code>EntryModifier</code> and <code>CommentModifier</code> are streams object,</p>
+
+<p>they are qualified to receive respective kind of object,</p>
+
+<p>and forge their properties with help of stream transforms,</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">\C\BlogData\Modifier\Entry</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObject</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObjectTransform</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Entity\Entry</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$object</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamObject</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>incProp(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-smi">$range_start</span>))</span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>setProp(<span class="pl-s"><span class="pl-pds">'</span>blog_entry_id<span class="pl-pds">'</span></span>, <span class="pl-smi">$range_start</span>))</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-k">-&gt;</span>write(<span class="pl-k">new</span> <span class="pl-c1">Entry</span>());</span></pre></div>
+
+<ul>
+<li><a href="https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php">https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php</a></li>
+<li><a href="https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Comment.php">https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Comment.php</a></li>
+</ul>
+
+<h5>
+<a id="object-modifiers" class="anchor" href="#object-modifiers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Object Modifiers</h5>
+
+<p>Object modifiers such <code>StreamObject</code>, <code>StreamDate</code> are streams transforms
+to update streamed objects.</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">C\Stream</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * Class StreamDate</span></span>
+<span class="pl-s1"><span class="pl-c"> * provides date property transform</span></span>
+<span class="pl-s1"><span class="pl-c"> *</span></span>
+<span class="pl-s1"><span class="pl-c"> * <span class="pl-k">@package</span> C\BlogData\Fixture</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">StreamDate</span>{</span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * update any written $chunk-&gt;$prop</span></span>
+<span class="pl-s1"><span class="pl-c">     * to set a date string</span></span>
+<span class="pl-s1"><span class="pl-c">     * formatted with $format</span></span>
+<span class="pl-s1"><span class="pl-c">     *</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> $prop</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> string $format</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> null $date</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> \Closure</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">generate</span> (<span class="pl-smi">$prop</span>, <span class="pl-smi">$format</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>Y-m-d H:i<span class="pl-pds">'</span></span>, <span class="pl-smi">$date</span><span class="pl-k">=</span><span class="pl-c1">null</span>) {</span>
+<span class="pl-s1">        <span class="pl-smi">$date</span> <span class="pl-k">=</span> <span class="pl-smi">$date</span><span class="pl-k">===</span><span class="pl-c1">null</span>? <span class="pl-k">new</span> <span class="pl-c1">\DateTime</span>() :<span class="pl-smi">$date</span>;</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>, <span class="pl-smi">$stream</span>) <span class="pl-k">use</span>(<span class="pl-smi">$prop</span>, <span class="pl-smi">$format</span>, <span class="pl-smi">$date</span>) {</span>
+<span class="pl-s1">            <span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span>{<span class="pl-smi">$prop</span>} <span class="pl-k">=</span> <span class="pl-c1">date_format</span>(<span class="pl-smi">$date</span>, <span class="pl-smi">$format</span>);</span>
+<span class="pl-s1">            <span class="pl-smi">$stream</span><span class="pl-k">-&gt;</span>push(<span class="pl-smi">$chunk</span>);</span>
+<span class="pl-s1">            <span class="pl-k">return</span> <span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span>{<span class="pl-smi">$prop</span>};</span>
+<span class="pl-s1">        };</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">    <span class="pl-c">//....</span></span>
+<span class="pl-s1">}</span></pre></div>
+
+<ul>
+<li><a href="https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamText.php">https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamText.php</a></li>
+<li><a href="https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamFlow.php">https://github.com/maboiteaspam/StreamObjectTransform/blob/master/src/C/Stream/StreamFlow.php</a></li>
+</ul>
+
+<h5>
+<a id="fixture-entity" class="anchor" href="#fixture-entity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixture Entity</h5>
+
+<p><code>EntryEntity</code> and <code>CommentEntity</code> are simple <code>PO</code> class.</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">C\BlogData\Entity</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Entry</span>{</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$id</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$created_at</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$updated_at</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$title</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$author</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$img_alt</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$content</span>;</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$status</span>;</span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@var</span> array C\BlogData\Entity\Comment</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-smi">$comments</span> <span class="pl-k">=</span> [];</span>
+<span class="pl-s1">}</span></pre></div>
+
+<ul>
+<li><a href="https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Entry.php">https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Entry.php</a></li>
+<li><a href="https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Comment.php">https://github.com/maboiteaspam/BlogData/blob/master/src/C/Entity/Comment.php</a></li>
+</ul>
+
+<h5>
+<a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion</h5>
+
+<p>Stream-Transforms are really cool : )</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/maboiteaspam/StreamObjectTransform/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/maboiteaspam/StreamObjectTransform/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/maboiteaspam/StreamObjectTransform"></a> is maintained by <a href="https://github.com/maboiteaspam">maboiteaspam</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
