@@ -41,11 +41,9 @@ it s more about the programming pattern that i found really cool.</p>
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
-<p>require dependencies and start</p>
-
-<p>to pipe object streams</p>
-
-<p>to generate and transform data.</p>
+<p>require dependencies, then start
+to connect pipe to transforms
+and stream objects.</p>
 
 <div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
 <span class="pl-s1"><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>;</span>
@@ -64,7 +62,7 @@ it s more about the programming pattern that i found really cool.</p>
 <span class="pl-s1">        <span class="pl-c">// sometimes it is interesting to not push the chunk.</span></span>
 <span class="pl-s1">    })</span>
 <span class="pl-s1"></span>
-<span class="pl-s1">    <span class="pl-c">// write a data or an object to stream</span></span>
+<span class="pl-s1">    <span class="pl-c">// write a data or an objeect to stream</span></span>
 <span class="pl-s1">    <span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>some<span class="pl-pds">'</span></span>);</span>
 <span class="pl-s1"></span></pre></div>
 
@@ -98,8 +96,7 @@ then run <code>composer update</code>.</p>
 <span class="pl-s1"><span class="pl-c">// create a stream</span></span>
 <span class="pl-s1"><span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
 <span class="pl-s1"></span>
-<span class="pl-s1">    <span class="pl-c">// pipe it to a demultiplexer, </span></span>
-<span class="pl-s1">    <span class="pl-c">// it will clone the streamed object n times</span></span>
+<span class="pl-s1">    <span class="pl-c">// pipe it to a demultiplexer</span></span>
 <span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe( <span class="pl-c1">StreamFlow</span><span class="pl-k">::</span>demultiplex(<span class="pl-c1">2</span>)</span>
 <span class="pl-s1"></span>
 <span class="pl-s1">            <span class="pl-c">// transform demultiplexed data</span></span>
@@ -239,9 +236,9 @@ then run <code>composer update</code>.</p>
 
 <p>It will demultiplex <code>$len</code> times the provided <code>$what</code> data.</p>
 
-<p>For each demultiplexed data, it transforms is with <code>$how</code>.</p>
+<p>For each chunk, it transforms it with <code>$transform</code>.</p>
 
-<p>It then pipe demultiplexed data to a resulting array <code>$results</code>.</p>
+<p>It then pipe each chunks to a resulting array <code>$results</code>.</p>
 
 <h5>
 <a id="fixture-generator" class="anchor" href="#fixture-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixture Generator</h5>
@@ -271,8 +268,7 @@ then run <code>composer update</code>.</p>
 <span class="pl-s1"><span class="pl-c"> */</span></span>
 <span class="pl-s1"><span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">EntryEntity</span>(), <span class="pl-c">// the model object to demultiplex</span></span>
 <span class="pl-s1">    <span class="pl-smi">$entry</span><span class="pl-k">-&gt;</span>transform() <span class="pl-c">// the stream transform to apply to each object</span></span>
-<span class="pl-s1">        <span class="pl-k">-&gt;</span>pipe( <span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>comments<span class="pl-pds">'</span></span>, <span class="pl-c">// update comments property</span></span>
-<span class="pl-s1">            <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>) <span class="pl-k">use</span>(<span class="pl-smi">$comment</span>) {</span>
+<span class="pl-s1">        <span class="pl-k">-&gt;</span>pipe( <span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>comments<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>) <span class="pl-k">use</span>(<span class="pl-smi">$comment</span>) { <span class="pl-c">// update comments property</span></span>
 <span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">CommentEntity</span>(), <span class="pl-c">// generate 2 comments</span></span>
 <span class="pl-s1">                    <span class="pl-smi">$comment</span><span class="pl-k">-&gt;</span>transform(<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>), <span class="pl-c">// forge them with this stream transform</span></span>
 <span class="pl-s1">                    <span class="pl-c1">2</span> );</span>
@@ -282,7 +278,14 @@ then run <code>composer update</code>.</p>
 
 <p>In this example a hundred <code>Entry</code> objects are created.</p>
 
-<p>Each object get its properties populated, 2 <code>Comment</code> are also attached.</p>
+<p>Each object get its properties populated by
+<code>entry-&gt;transform()</code>.</p>
+
+<p>A pipe is then connected to generate and attach 2 <code>Comment</code>
+to the current <code>Entry</code> chunk.</p>
+
+<p>Each <code>Comment</code> is transformed by <code>comment-&gt;transform($chunk-&gt;id)</code>.
+The entry id is used to distribute ids of the <code>Comment</code> objects.</p>
 
 <p>It finally returns an array of forged <code>Entity</code> objects.</p>
 
