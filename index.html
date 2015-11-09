@@ -42,8 +42,8 @@ it s more about the programming pattern that i found really cool.</p>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <p>require dependencies, then start
-to connect pipe to transforms
-and stream objects.</p>
+to connect pipe to stream
+and transforms objects.</p>
 
 <div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
 <span class="pl-s1"><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>;</span>
@@ -195,7 +195,7 @@ then run <code>composer update</code>.</p>
 <h5>
 <a id="generator" class="anchor" href="#generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Generator</h5>
 
-<p>If you define and use a class help to generate entities such,</p>
+<p>If you define and use a class helper to generate entities such,</p>
 
 <p><strong>File:</strong> /C/Fixture/Generator.php</p>
 
@@ -243,7 +243,7 @@ then run <code>composer update</code>.</p>
 <h5>
 <a id="fixture-generator" class="anchor" href="#fixture-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixture Generator</h5>
 
-<p>This helps to write simple <code>fixtures</code> generators such as,</p>
+<p>With this new helper on hand, a <code>fixtures</code> generator can look like this,</p>
 
 <div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
 <span class="pl-s1"></span>
@@ -266,14 +266,16 @@ then run <code>composer update</code>.</p>
 <span class="pl-s1"><span class="pl-c"> * is random.</span></span>
 <span class="pl-s1"><span class="pl-c"> *</span></span>
 <span class="pl-s1"><span class="pl-c"> */</span></span>
-<span class="pl-s1"><span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">EntryEntity</span>(), <span class="pl-c">// the model object to demultiplex</span></span>
-<span class="pl-s1">    <span class="pl-smi">$entry</span><span class="pl-k">-&gt;</span>transform() <span class="pl-c">// the stream transform to apply to each object</span></span>
+<span class="pl-s1"><span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">EntryEntity</span>(),      <span class="pl-c">// the model object to demultiplex</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-smi">$entry</span><span class="pl-k">-&gt;</span>transform()     <span class="pl-c">// the stream transform to apply to each object</span></span>
 <span class="pl-s1">        <span class="pl-k">-&gt;</span>pipe( <span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>comments<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>) <span class="pl-k">use</span>(<span class="pl-smi">$comment</span>) { <span class="pl-c">// update comments property</span></span>
-<span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate( <span class="pl-k">new</span> <span class="pl-c1">CommentEntity</span>(), <span class="pl-c">// generate 2 comments</span></span>
+<span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-c1">Generator</span><span class="pl-k">::</span>generate(</span>
+<span class="pl-s1">                    <span class="pl-k">new</span> <span class="pl-c1">CommentEntity</span>(), <span class="pl-c">// generate 2 comments</span></span>
 <span class="pl-s1">                    <span class="pl-smi">$comment</span><span class="pl-k">-&gt;</span>transform(<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>), <span class="pl-c">// forge them with this stream transform</span></span>
 <span class="pl-s1">                    <span class="pl-c1">2</span> );</span>
-<span class="pl-s1">            })</span>
-<span class="pl-s1">        )</span>
+<span class="pl-s1">        }))</span>
 <span class="pl-s1">    , <span class="pl-c1">100</span>); <span class="pl-c">// count of objects to create</span></span></pre></div>
 
 <p>In this example a hundred <code>Entry</code> objects are created.</p>
@@ -300,20 +302,55 @@ The entry id is used to distribute ids of the <code>Comment</code> objects.</p>
 
 <p>and forge their properties with help of stream transforms,</p>
 
-<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">\C\BlogData\Modifier\Entry</span>;</span>
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">namespace</span> <span class="pl-en">C\BlogData\Modifier</span>;</span>
 <span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamImgUrl</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamDate</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamText</span>;</span>
 <span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObject</span>;</span>
 <span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\Stream\StreamObjectTransform</span>;</span>
-<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\C\BlogData\Entity\Entry</span>;</span>
 <span class="pl-s1"></span>
-<span class="pl-s1"><span class="pl-smi">$object</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamObject</span>();</span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * Class Entry</span></span>
+<span class="pl-s1"><span class="pl-c"> * provides stream to forge</span></span>
+<span class="pl-s1"><span class="pl-c"> * Entry entities</span></span>
+<span class="pl-s1"><span class="pl-c"> *</span></span>
+<span class="pl-s1"><span class="pl-c"> * <span class="pl-k">@package</span> C\BlogData\Modifier</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Entry</span>{</span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * return a stream object</span></span>
+<span class="pl-s1"><span class="pl-c">     * to transform any pushed $entry entity</span></span>
+<span class="pl-s1"><span class="pl-c">     *</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span> int $range_start</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> mixed</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">transform</span> (<span class="pl-smi">$range_start</span><span class="pl-k">=</span><span class="pl-c1">0</span>) {</span>
 <span class="pl-s1"></span>
-<span class="pl-s1"><span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
+<span class="pl-s1">        <span class="pl-smi">$imgUrlGenerator</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamImgUrl</span>();</span>
+<span class="pl-s1">        <span class="pl-smi">$dateGenerator</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamDate</span>();</span>
+<span class="pl-s1">        <span class="pl-smi">$textGenerator</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamText</span>();</span>
+<span class="pl-s1">        <span class="pl-smi">$object</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">StreamObject</span>();</span>
 <span class="pl-s1"></span>
-<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>incProp(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-smi">$range_start</span>))</span>
-<span class="pl-s1">    <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>setProp(<span class="pl-s"><span class="pl-pds">'</span>blog_entry_id<span class="pl-pds">'</span></span>, <span class="pl-smi">$range_start</span>))</span>
-<span class="pl-s1"></span>
-<span class="pl-s1">    <span class="pl-k">-&gt;</span>write(<span class="pl-k">new</span> <span class="pl-c1">Entry</span>());</span></pre></div>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-c1">StreamObjectTransform</span><span class="pl-k">::</span>through()</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$object</span><span class="pl-k">-&gt;</span>incProp(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-smi">$range_start</span>))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>generate(<span class="pl-s"><span class="pl-pds">'</span>created_at<span class="pl-pds">'</span></span>))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>created_at<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>, <span class="pl-smi">$prop</span>) <span class="pl-k">use</span>(<span class="pl-smi">$dateGenerator</span>){</span>
+<span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>sub(<span class="pl-smi">$prop</span>, <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>} days + 1*{<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>} hours<span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">            }))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>generate(<span class="pl-s"><span class="pl-pds">'</span>updated_at<span class="pl-pds">'</span></span>))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>modify(<span class="pl-s"><span class="pl-pds">'</span>updated_at<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">$chunk</span>, <span class="pl-smi">$prop</span>) <span class="pl-k">use</span>(<span class="pl-smi">$dateGenerator</span>){</span>
+<span class="pl-s1">                <span class="pl-k">return</span> <span class="pl-smi">$dateGenerator</span><span class="pl-k">-&gt;</span>sub(<span class="pl-smi">$prop</span>, <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>} days + 1*{<span class="pl-smi">$chunk</span><span class="pl-k">-&gt;</span><span class="pl-smi">id</span>} hours<span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1">            }))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$textGenerator</span><span class="pl-k">-&gt;</span>enum(<span class="pl-s"><span class="pl-pds">'</span>author<span class="pl-pds">'</span></span>, <span class="pl-smi">$textGenerator</span><span class="pl-k">-&gt;</span><span class="pl-smi">nicknames</span>))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$textGenerator</span><span class="pl-k">-&gt;</span>enum(<span class="pl-s"><span class="pl-pds">'</span>status<span class="pl-pds">'</span></span>, [<span class="pl-s"><span class="pl-pds">'</span>VISIBLE<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>HIDDEN<span class="pl-pds">'</span></span>]))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$textGenerator</span><span class="pl-k">-&gt;</span>words(<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>, <span class="pl-c1">rand</span>(<span class="pl-c1">2</span>, <span class="pl-c1">5</span>)))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$textGenerator</span><span class="pl-k">-&gt;</span>sentences(<span class="pl-s"><span class="pl-pds">'</span>content<span class="pl-pds">'</span></span>, <span class="pl-c1">rand</span>(<span class="pl-c1">1</span>, <span class="pl-c1">3</span>)))</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>pipe(<span class="pl-smi">$imgUrlGenerator</span><span class="pl-k">-&gt;</span>imgUrl(<span class="pl-s"><span class="pl-pds">'</span>img_alt<span class="pl-pds">'</span></span>, <span class="pl-c1">rand</span>(<span class="pl-c1">1</span>, <span class="pl-c1">3</span>)))</span>
+<span class="pl-s1">            ;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">}</span></pre></div>
 
 <ul>
 <li><a href="https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php">https://github.com/maboiteaspam/BlogData/blob/master/src/C/Modifier/Entry.php</a></li>
