@@ -10,8 +10,8 @@ See yourself!
 ### Usage
 
 require dependencies, then start
-to connect pipe to transforms
-and stream objects.
+to connect pipe to stream
+and transforms objects.
 
 
 ```php
@@ -256,8 +256,10 @@ In this example a hundred `Entry` objects are created.
 
 Each object get its properties populated by
 `entry->transform()`.
+
 A pipe is then connected to generate and attach 2 `Comment`
 to the current `Entry` chunk.
+
 Each `Comment` is transformed by `comment->transform($chunk->id)`.
 The entry id is used to distribute ids of the `Comment` objects.
 
