@@ -9,8 +9,8 @@
   },
   "require": {
     "php": ">=5.5.0",
-    "st/event-dispatcher": "dev-master#v1.0.2",
-    "im/event-dispatcher": "dev-master#v1.0.4"
+    "st/event-dispatcher": "v1.0.2",
+    "im/event-dispatcher": "v1.0.4"
   },
   "repositories": [
     {
