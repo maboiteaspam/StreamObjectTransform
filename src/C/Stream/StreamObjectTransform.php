@@ -10,6 +10,8 @@ namespace C\Stream;
  */
 class StreamObjectTransform{
 
+    use \im\Event\EventEmitter;
+
     /**
      * @var \Closure|null
      */
@@ -44,6 +46,8 @@ class StreamObjectTransform{
                 // $stream->write(null) is invoked
                 // to signal the end of the underlying data stream
             };
+
+        $this->dispatcher = new \im\Event\EventDispatcher();
     }
 
     /**
@@ -108,32 +112,6 @@ class StreamObjectTransform{
             }
         }
     }
-
-    #region this should probably belong to an EventEmitter trait
-    protected $events = [];
-    public function on($event, $then) {
-        if (!isset($this->events[$event])) {
-            $this->events[$event] = [];
-        }
-        $this->events[$event][] = $then;
-    }
-    public function off($event, $then) {
-        if (!isset($this->events[$event])) {
-            $this->events[$event] = [];
-        }
-        $this->events[$event] = array_diff($this->events[$event], array($then));
-    }
-    public function emit($event) {
-        $args = func_get_args();
-        array_shift($args);
-        if (isset($this->events[$event])) {
-            foreach ($this->events[$event] as $handler) {
-                call_user_func_array($handler, $args);
-            }
-        }
-    }
-    #endregion
-
 
     /**
      * helper to create new stream
