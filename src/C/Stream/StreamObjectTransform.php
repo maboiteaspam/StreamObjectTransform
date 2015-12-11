@@ -34,6 +34,7 @@ class StreamObjectTransform{
             : function ($chunk, $stream) {
                 // must push $chunk
                 // if, it want to forward the data
+                /* @var $stream StreamObjectTransform */
                 $stream->push($chunk);
                 // sometimes, it want to skip them from following processing.
             };
@@ -85,6 +86,7 @@ class StreamObjectTransform{
      */
     public function push($some) {
         foreach($this->streams as $stream) {
+            /* @var $stream StreamObjectTransform */
             $stream->write($some);
         }
     }
@@ -95,18 +97,36 @@ class StreamObjectTransform{
      * @param mixed $some
      */
     public function write($some) {
-        if ($this->onData) {
-            if ($some!==NULL) {
+        if ($some!==NULL) {
+            if ($this->onData) {
                 $boundCl = $this->onData;
                 $boundCl($some, $this);
-
-            } else {
-                // Should it emit close / end event here ?
-                $boundCl = $this->onFlush;
-                $boundCl($some, $this);
-
             }
+
+        } else {
+            $this->flush($some);
         }
+    }
+
+    /**
+     * Flush the stream.
+     *
+     * @param $remains
+     */
+    public function flush($remains) {
+        if ($this->onFlush) {
+            // Should it emit close / end event here ?
+            $boundCl = $this->onFlush;
+            $boundCl($remains, $this);
+        }
+    }
+
+    /**
+     * @param $some
+     */
+    public function writeFlush($some) {
+        $this->write($some);
+        $this->write(NULL);
     }
 
     #region this should probably belong to an EventEmitter trait
